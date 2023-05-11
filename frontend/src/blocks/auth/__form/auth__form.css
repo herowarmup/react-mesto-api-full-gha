@@ -1,0 +1,9 @@
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-height: 358px;
+  height: 100%;
+  width: 100%;
+  max-width: 358px;
+}

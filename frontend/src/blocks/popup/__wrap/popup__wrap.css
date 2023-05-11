@@ -1,0 +1,18 @@
+.popup__wrap {
+  display: flex;
+  width: 430px;
+  background-color: #fff;
+  flex-direction: column;
+  border-radius: 10px;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+}
+
+@media screen and (max-width: 750px) {
+  .popup__wrap {
+    width: 282px;
+  }
+}

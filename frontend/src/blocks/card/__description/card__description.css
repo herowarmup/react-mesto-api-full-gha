@@ -1,0 +1,7 @@
+.card__description {
+  font-family: "Inter", Arial, sans-serif;
+  display: flex;
+  justify-content: space-between;
+  padding: 25px 20px;
+  align-items: center;
+}

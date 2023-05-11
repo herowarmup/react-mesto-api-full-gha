@@ -1,0 +1,7 @@
+.profile__avatar-container {
+  background: url('../../../src/images/edit.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 26px;
+  transition: opacity 0.3s linear;
+}
