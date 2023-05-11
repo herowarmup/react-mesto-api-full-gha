@@ -6,8 +6,6 @@ function Login({ handleLogin, loggedIn }) {
     handleLogin(email, password);
   }
 
-  console.log(loggedIn);
-
   if (loggedIn) {
     return <NavLink to='/' />;
   }
