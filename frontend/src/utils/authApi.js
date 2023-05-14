@@ -3,7 +3,7 @@ const BASE_URL = 'http://localhost:3000';
 async function request(url, method, body, token) {
   const headers = {
     Accept: 'application/json',
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   };
 
   if (token) {
@@ -12,6 +12,7 @@ async function request(url, method, body, token) {
 
   const options = {
     method,
+    credentials: 'include',
     headers,
     body: body ? JSON.stringify(body) : undefined,
   };
@@ -36,7 +37,7 @@ export const register = (email, password) => {
 };
 
 export const login = (email, password) => {
-  return request('/signin', 'POST', { email, password });
+  return request('/signin', 'POST', { email, password })
 };
 
 export const checkToken = (token) => {

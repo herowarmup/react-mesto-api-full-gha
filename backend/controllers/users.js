@@ -119,10 +119,10 @@ async function login(req, res, next) {
     res.cookie('jwt', token, {
       maxAge: 3600000,
       httpOnly: true,
-      sameSite: true,
+      // sameSite: true,
     });
 
-    return res.status(StatusCodes.OK).send({ });
+    return res.status(StatusCodes.OK).send({ token });
   } catch (err) {
     next(err);
   }

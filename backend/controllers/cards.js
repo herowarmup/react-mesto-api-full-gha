@@ -2,12 +2,12 @@
 const { StatusCodes } = require('http-status-codes');
 
 const Card = require('../models/card');
-const { CustomError } = require('../middleware/errorHandler');
+const { CustomError, errorHandler } = require('../middleware/errorHandler');
 
 async function getCards(req, res, next) {
   try {
     const cards = await Card.find({});
-    res.send({ data: cards });
+    res.send(cards);
   } catch (err) {
     next(err);
   }
@@ -46,25 +46,24 @@ async function deleteCard(req, res, next) {
 
 async function likeCard(req, res, next) {
   const { cardId } = req.params;
+  const { _id: userId } = req.user;
 
-  try {
-    const card = await Card.findByIdAndUpdate(
-      cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true, runValidators: true },
-    );
-    if (!card) {
-      next(new CustomError('Карточка не найдена', StatusCodes.NOT_FOUND));
-    } else {
-      res.send({ data: card });
-    }
-  } catch (err) {
-    if (err.name === 'CastError') {
-      next(new CustomError('Переданы некорректные данные', StatusCodes.BAD_REQUEST));
-    } else {
-      next(err);
-    }
-  }
+  Card.findById(cardId)
+    .then((card) => {
+      if (!card) {
+        return next(new CustomError('Карточка не найдена', StatusCodes.NOT_FOUND));
+      }
+      return Card.findByIdAndUpdate(
+        cardId,
+        { $addToSet: { likes: userId } },
+        { new: true },
+      )
+        .then((cardForLike) => cardForLike.populate(['owner', 'likes']))
+        .then((cardForLike) => { res.send(cardForLike); });
+    })
+    .catch(() => {
+      next(errorHandler);
+    });
 }
 
 async function dislikeCard(req, res, next) {

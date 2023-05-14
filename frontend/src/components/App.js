@@ -27,7 +27,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(localStorage.getItem('email') || '');
   const [toolTipInfo, setToolTipInfo] = useState({ errorMessage: '', isOpen: false });
   const navigate = useNavigate();
 
@@ -54,10 +54,11 @@ function App() {
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    console.log(card._id, isLiked)
     api
       .setLike(card._id, isLiked)
       .then((newCard) => {
-        setCards(cards.map((с) => (с._id === newCard._id ? newCard : с)));
+        setCards((state) => state.map((c) => (c._id === newCard._id ? newCard : c)));
       })
       .catch((err) => console.log(err));
   }
@@ -95,7 +96,7 @@ function App() {
     api
       .createCard(userData)
       .then((newUserData) => {
-        setCards([newUserData, ...cards]);
+        setCards([...cards, newUserData]);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
@@ -107,8 +108,8 @@ function App() {
       .then((data) => {
         if (data.token) {
           localStorage.setItem('token', data.token);
-          console.log(data)
           setLoggedIn(true);
+          localStorage.setItem('email', email)
           setEmail(email);
           navigate('/', { replace: true });
         }
@@ -134,7 +135,7 @@ function App() {
   }
 
   function handleLogout() {
-    setLoggedIn(false);
+    localStorage.removeItem('email');
     setEmail('');
     localStorage.removeItem('token');
     navigate('/sign-in', { replace: true });
@@ -147,12 +148,14 @@ function App() {
         .checkToken(token)
         .then(({ data }) => {
           setLoggedIn(true);
-          setEmail(data.email);
+          if (data) {
+            setEmail(data.email);
+          }
           navigate('/', { replace: true });
         })
         .catch((err) => console.log(err));
     }
-  }, [navigate]);
+  }, [navigate]);  
 
   useEffect(() => {
     handleTokenCheck();

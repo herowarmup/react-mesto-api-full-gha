@@ -18,6 +18,7 @@ class Api {
 
   getUserInfo() {
     return this._request(`${this._baseUrl}/users/me`, {
+      credentials: 'include',
       headers: this._headers,
     });
   }
@@ -25,6 +26,7 @@ class Api {
   setUserInfo(data) {
     return this._request(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
+      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify(data),
     });
@@ -33,6 +35,7 @@ class Api {
   updateAvatar(data) {
     return this._request(`${this._baseUrl}/users/me/avatar`, {
       method: 'PATCH',
+      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify(data),
     });
@@ -40,6 +43,7 @@ class Api {
 
   getInitialCards() {
     return this._request(`${this._baseUrl}/cards`, {
+      credentials: 'include',
       headers: this._headers,
     });
   }
@@ -48,6 +52,7 @@ class Api {
     return this._request(`${this._baseUrl}/cards`, {
       method: 'POST',
       body: JSON.stringify(data),
+      credentials: 'include',
       headers: this._headers,
     });
   }
@@ -55,6 +60,7 @@ class Api {
   deleteCard(id) {
     return this._request(`${this._baseUrl}/cards/${id}`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: this._headers,
     });
   }
@@ -62,13 +68,14 @@ class Api {
   setLike(id, isLiked) {
     return this._request(`${this._baseUrl}/cards/${id}/likes`, {
       method: isLiked ? 'DELETE' : 'PUT',
+      credentials: 'include',
       headers: this._headers,
     });
   }
 }
 
 const api = new Api({
-  baseUrl: 'http://localhost:3000/',
+  baseUrl: 'http://localhost:3000',
   headers: {
     authorization: 'secret-phrase-1234',
     'Content-Type': 'application/json',

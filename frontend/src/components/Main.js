@@ -12,7 +12,6 @@ export default function Main({
   cards,
 }) {
   const currentUser = useContext(CurrentUserContext);
-
   return (
     <main className='content'>
       <section className='profile'>
@@ -37,21 +36,23 @@ export default function Main({
         />
       </section>
       <section className='cards'>
-        <ul className='cards__items'>
-          {cards.map((card) => {
-            return (
-              <li className='card' key={card._id}>
-                <Card
-                  card={card}
-                  onCardClick={onCardClick}
-                  onCardLike={onCardLike}
-                  onCardDelete={onCardDelete}
-                />
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+  <ul className='cards__items'>
+    {cards.slice(0).reverse().map((card) => {
+      return (
+        <li className='card' key={card._id}>
+          <Card
+            card={card}
+            onCardClick={onCardClick}
+            onCardLike={onCardLike}
+            onCardDelete={onCardDelete}
+          />
+        </li>
+      );
+    })}
+  </ul>
+</section>
+
+
     </main>
   );
 }
