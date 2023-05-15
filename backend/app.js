@@ -4,6 +4,10 @@ const cors = require('cors');
 
 const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
+
+const helmet = require('helmet');
+const limiter = require('./middleware/limiter');
+
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 
@@ -16,6 +20,9 @@ app.use(cors({
   origin: ['http://localhost:3001'],
   credentials: true,
 }));
+
+app.use(helmet());
+app.use(limiter);
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
