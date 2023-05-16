@@ -40,8 +40,6 @@ app.use(router);
 
 app.use(errorLogger);
 
-app.options('*', cors());
-
 app.use(errors());
 app.use(errorHandler);
 
