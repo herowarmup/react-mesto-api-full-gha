@@ -8,7 +8,7 @@
 
 ## Ссылки на проект
 
-IP-адрес 158.160.47.140
+IP 158.160.47.140
 
 Frontend https://herowarmup.nomoredomains.monster
 
