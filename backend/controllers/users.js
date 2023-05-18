@@ -47,7 +47,8 @@ async function createUser(req, res, next) {
       password: hash,
     }))
     .then((user) => {
-      res.status(StatusCodes.CREATED).send({ data: user });
+      const { password: hashedPassword, ...userData } = user.toObject();
+      res.status(StatusCodes.CREATED).send({ data: userData });
     })
     .catch((err) => {
       if (err.code === 11000) {
