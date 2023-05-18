@@ -1,4 +1,4 @@
-require('dotenv').config();
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
@@ -14,7 +14,7 @@ const auth = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET);
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'secret-phrase-1234');
   } catch (err) {
     return next(new CustomError('Необходима авторизация', StatusCodes.UNAUTHORIZED));
   }

@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-require('dotenv').config();
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -46,8 +46,8 @@ async function createUser(req, res, next) {
       avatar,
       password: hash,
     }))
-    .then((data) => {
-      res.status(StatusCodes.CREATED).send(data);
+    .then((user) => {
+      res.status(StatusCodes.CREATED).send({ data: user });
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -121,9 +121,11 @@ async function login(req, res, next) {
       return next(new CustomError('Неверный пароль', StatusCodes.UNAUTHORIZED));
     }
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = jwt.sign(
+      { _id: user._id },
+      NODE_ENV === 'production' ? JWT_SECRET : 'secret-phrase-1234',
+      { expiresIn: '7d' },
+    );
 
     res.cookie('jwt', token, {
       maxAge: 3600000,
