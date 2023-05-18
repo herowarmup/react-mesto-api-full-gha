@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 const { CustomError } = require('./errorHandler');
@@ -12,7 +14,7 @@ const auth = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'secret-phrase-1234');
+    payload = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
     return next(new CustomError('Необходима авторизация', StatusCodes.UNAUTHORIZED));
   }

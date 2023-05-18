@@ -31,76 +31,6 @@ function App() {
   const [toolTipInfo, setToolTipInfo] = useState({ errorMessage: '', isOpen: false });
   const navigate = useNavigate();
 
-  function handleEditProfileClick() {
-    setIsEditProfilePopupOpen(true);
-  }
-  function handleAddPlaceClick() {
-    setIsAddPlacePopupOpen(true);
-  }
-  function handleEditAvatarClick() {
-    setIsEditAvatarPopupOpen(true);
-  }
-  function handleCardClick(data) {
-    setSelectedCard(data);
-    setImagePopupOpen(true);
-  }
-  function closeAllPopups() {
-    setIsEditProfilePopupOpen(false);
-    setIsAddPlacePopupOpen(false);
-    setIsEditAvatarPopupOpen(false);
-    setImagePopupOpen(false);
-    setToolTipInfo(false);
-  }
-
-  function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    console.log(card._id, isLiked)
-    api
-      .setLike(card._id, isLiked)
-      .then((newCard) => {
-        setCards((state) => state.map((c) => (c._id === newCard._id ? newCard : c)));
-      })
-      .catch((err) => console.log(err));
-  }
-
-  function handleCardDelete(card) {
-    api
-      .deleteCard(card._id)
-      .then(() => {
-        setCards(cards.filter((c) => c._id !== card._id));
-      })
-      .catch((err) => console.log(err));
-  }
-
-  function handleUpdateUserInfo(userData) {
-    api
-      .setUserInfo(userData)
-      .then((newUserData) => {
-        setCurrentUser(newUserData);
-        closeAllPopups();
-      })
-      .catch((err) => console.log(err));
-  }
-
-  function handleUpdateAvatar(userData) {
-    api
-      .updateAvatar(userData)
-      .then((newUserData) => {
-        setCurrentUser(newUserData);
-        closeAllPopups();
-      })
-      .catch((err) => console.log(err));
-  }
-
-  function handleAddPlaceSubmit(userData) {
-    api
-      .createCard(userData)
-      .then((newUserData) => {
-        setCards([...cards, newUserData]);
-        closeAllPopups();
-      })
-      .catch((err) => console.log(err));
-  }
 
   function handleLogin(email, password) {
     auth
@@ -182,6 +112,78 @@ function App() {
         });
     }
   }, [loggedIn]);
+
+  function handleEditProfileClick() {
+    setIsEditProfilePopupOpen(true);
+  }
+  function handleAddPlaceClick() {
+    setIsAddPlacePopupOpen(true);
+  }
+  function handleEditAvatarClick() {
+    setIsEditAvatarPopupOpen(true);
+  }
+  function handleCardClick(data) {
+    setSelectedCard(data);
+    setImagePopupOpen(true);
+  }
+  function closeAllPopups() {
+    setIsEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setImagePopupOpen(false);
+    setToolTipInfo(false);
+  }
+
+  function handleCardLike(card) {
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    console.log(card._id, isLiked)
+    api
+      .setLike(card._id, isLiked)
+      .then((newCard) => {
+        console.log(newCard)
+        setCards((state) => state.map((c) => (c._id === newCard._id ? { ...newCard } : c)));
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleCardDelete(card) {
+    api
+      .deleteCard(card._id)
+      .then(() => {
+        setCards(cards.filter((c) => c._id !== card._id));
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleUpdateUserInfo(userData) {
+    api
+      .setUserInfo(userData)
+      .then((newUserData) => {
+        setCurrentUser(newUserData);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleUpdateAvatar(userData) {
+    api
+      .updateAvatar(userData)
+      .then((newUserData) => {
+        setCurrentUser(newUserData);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleAddPlaceSubmit(userData) {
+    api
+      .createCard(userData)
+      .then((newUserData) => {
+        setCards([...cards, newUserData]);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err));
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>

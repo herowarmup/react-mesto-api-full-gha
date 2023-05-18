@@ -5,11 +5,11 @@ const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 
 const helmet = require('helmet');
-const corsHandler = require('./middleware/corsHandler');
 const limiter = require('./middleware/limiter');
 
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const { errorHandler } = require('./middleware/errorHandler');
+const corsHandler = require('./middleware/corsHandler');
 
 const router = require('./routes/index');
 
@@ -22,13 +22,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 
 app.use(corsHandler);
 app.use(helmet());
+app.use(requestLogger);
 app.use(limiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-app.use(requestLogger);
 
 app.get('/crash-test', () => {
   setTimeout(() => {

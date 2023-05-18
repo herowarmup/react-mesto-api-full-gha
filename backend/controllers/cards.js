@@ -4,24 +4,25 @@ const { StatusCodes } = require('http-status-codes');
 const Card = require('../models/card');
 const { CustomError, errorHandler } = require('../middleware/errorHandler');
 
-async function getCards(req, res, next) {
-  try {
-    const cards = await Card.find({});
-    res.send(cards);
-  } catch (err) {
-    next(err);
-  }
+function getCards(req, res, next) {
+  Card.find({})
+    .populate(['owner', 'likes'])
+    .then((cards) => res.send(cards))
+    .catch(next);
 }
 
-async function createCard(req, res, next) {
-  try {
-    const { name, link } = req.body;
-    const owner = req.user._id;
-    const card = await Card.create({ name, link, owner });
-    res.send(card);
-  } catch (err) {
-    next(err);
-  }
+function createCard(req, res, next) {
+  const { name, link } = req.body;
+  const owner = req.user._id;
+
+  Card.create({ name, link, owner })
+    .then((card) => card.populate('owner'))
+    .then((card) => res.status(StatusCodes.CREATED).send(card))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new CustomError('Некорректные данные при создании карточки', StatusCodes.BAD_REQUEST));
+      }
+    });
 }
 
 async function deleteCard(req, res, next) {
@@ -68,25 +69,24 @@ async function likeCard(req, res, next) {
 
 async function dislikeCard(req, res, next) {
   const { cardId } = req.params;
-  const userId = req.user._id;
+  const { _id: userId } = req.user;
 
-  try {
-    const card = await Card.findOneAndUpdate(
-      { _id: cardId, likes: userId },
-      { $pull: { likes: userId } },
-      { new: true, runValidators: true },
-    );
-    if (!card) {
-      return next(new CustomError('Карточка не найдена', StatusCodes.NOT_FOUND));
-    }
-    res.send({ data: card });
-  } catch (err) {
-    if (err.name === 'CastError') {
-      next(new CustomError('Переданы некорректные данные', StatusCodes.BAD_REQUEST));
-    } else {
-      next(err);
-    }
-  }
+  Card.findById(cardId)
+    .then((card) => {
+      if (!card) {
+        return next(new CustomError('Карточка не найдена', StatusCodes.NOT_FOUND));
+      }
+      return Card.findByIdAndUpdate(
+        cardId,
+        { $pull: { likes: userId } },
+        { new: true },
+      )
+        .then((cardForDislikeLike) => cardForDislikeLike.populate(['owner', 'likes']))
+        .then((cardForDislikeLike) => { res.send(cardForDislikeLike); });
+    })
+    .catch(() => {
+      next(errorHandler);
+    });
 }
 
 module.exports = {

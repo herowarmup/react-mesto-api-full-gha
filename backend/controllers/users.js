@@ -1,4 +1,6 @@
 /* eslint-disable consistent-return */
+require('dotenv').config();
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { StatusCodes } = require('http-status-codes');
@@ -36,33 +38,26 @@ async function createUser(req, res, next) {
     name, about, avatar, email, password,
   } = req.body;
 
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      next(new CustomError('Такой e-mail уже зарегистрирован!', StatusCodes.CONFLICT));
-    }
-
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
       email,
-      password: hash,
       name,
       about,
       avatar,
+      password: hash,
+    }))
+    .then((data) => {
+      res.status(StatusCodes.CREATED).send(data);
+    })
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new CustomError('Пользователь с таким email уже существует', StatusCodes.CONFLICT));
+      } else if (err.name === 'ValidationError') {
+        next(new CustomError('Проверьте правильность данных', StatusCodes.BAD_REQUEST));
+      } else {
+        next(err);
+      }
     });
-
-    const userWithoutPassword = {
-      _id: user._id,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-    };
-
-    res.status(StatusCodes.CREATED).send({ user: userWithoutPassword });
-  } catch (err) {
-    next(err);
-  }
 }
 
 async function updateUser(req, res, next) {
@@ -77,11 +72,15 @@ async function updateUser(req, res, next) {
       { new: true, runValidators: true },
     );
     if (!updatedUser) {
-      next(new CustomError('Пользователь не найден', StatusCodes.NOT_FOUND));
+      return next(new CustomError('Пользователь не найден', StatusCodes.NOT_FOUND));
     }
     return res.send(updatedUser);
   } catch (err) {
-    next(err);
+    if (err.name === 'ValidationError') {
+      next(new CustomError('Проверьте правильность данных', StatusCodes.BAD_REQUEST));
+    } else {
+      next(err);
+    }
   }
 }
 
@@ -98,7 +97,11 @@ async function updateAvatar(req, res, next) {
     );
     res.send(updatedUser);
   } catch (err) {
-    next(err);
+    if (err.name === 'ValidationError') {
+      next(new CustomError('Проверьте правильность данных', StatusCodes.BAD_REQUEST));
+    } else {
+      next(err);
+    }
   }
 }
 
@@ -106,13 +109,19 @@ async function login(req, res, next) {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email }).select(password);
+    const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-      next(new CustomError('Пользователь не найден', StatusCodes.UNAUTHORIZED));
+      return next(new CustomError('Пользователь не найден', StatusCodes.UNAUTHORIZED));
     }
 
-    const token = jwt.sign({ _id: user._id }, 'secret-phrase-1234', {
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return next(new CustomError('Неверный пароль', StatusCodes.UNAUTHORIZED));
+    }
+
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '7d',
     });
 
@@ -132,7 +141,7 @@ async function getCurrentUser(req, res, next) {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      next(new CustomError('Пользователь не найден', StatusCodes.NOT_FOUND));
+      return next(new CustomError('Пользователь не найден', StatusCodes.NOT_FOUND));
     }
     return res.send({
       name: user.name,

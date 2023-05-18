@@ -25,7 +25,8 @@ export default function Main({
             type='button'
             aria-label='Редактировать'
             onClick={onEditProfile}
-          />
+          >
+          </button>
           <p className='profile__about'>{currentUser.about}</p>
         </div>
         <button
@@ -33,26 +34,23 @@ export default function Main({
           type='button'
           aria-label='Добавить'
           onClick={onAddPlace}
-        />
+        >
+        </button>
       </section>
       <section className='cards'>
-  <ul className='cards__items'>
-    {cards.slice(0).reverse().map((card) => {
-      return (
-        <li className='card' key={card._id}>
-          <Card
-            card={card}
-            onCardClick={onCardClick}
-            onCardLike={onCardLike}
-            onCardDelete={onCardDelete}
-          />
-        </li>
-      );
-    })}
-  </ul>
-</section>
-
-
+        <ul className='cards__items'>
+          {cards.slice(0).reverse().map((card) => (
+            <li className='card' key={card._id}>
+              <Card
+                card={card}
+                onCardClick={onCardClick}
+                onCardLike={onCardLike}
+                onCardDelete={onCardDelete}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
     </main>
   );
 }

@@ -75,9 +75,9 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: 'https://api.herowarmup.nomoredomains.monster',
+  // baseUrl: 'https://api.herowarmup.nomoredomains.monster',
+  baseUrl: 'http://localhost:3000',
   headers: {
-    // authorization: 'secret-phrase-1234',
     'Content-Type': 'application/json',
   },
 });
