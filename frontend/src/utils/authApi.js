@@ -1,5 +1,5 @@
-// const BASE_URL = 'https://api.herowarmup.nomoredomains.monster';
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://api.herowarmup.nomoredomains.monster';
+// const BASE_URL = 'http://localhost:3000';
 
 async function request(url, method, body, token) {
   const headers = {
