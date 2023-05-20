@@ -2,7 +2,7 @@
 const { StatusCodes } = require('http-status-codes');
 
 const Card = require('../models/card');
-const { CustomError, errorHandler } = require('../middleware/errorHandler');
+const { CustomError } = require('../middleware/errorHandler');
 
 function getCards(req, res, next) {
   Card.find({})
@@ -21,6 +21,8 @@ function createCard(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new CustomError('Некорректные данные при создании карточки', StatusCodes.BAD_REQUEST));
+      } else {
+        next(err);
       }
     });
 }
@@ -62,9 +64,7 @@ async function likeCard(req, res, next) {
         .then((cardForLike) => cardForLike.populate(['owner', 'likes']))
         .then((cardForLike) => { res.send(cardForLike); });
     })
-    .catch(() => {
-      next(errorHandler);
-    });
+    .catch(next);
 }
 
 async function dislikeCard(req, res, next) {
@@ -84,9 +84,7 @@ async function dislikeCard(req, res, next) {
         .then((cardForDislikeLike) => cardForDislikeLike.populate(['owner', 'likes']))
         .then((cardForDislikeLike) => { res.send(cardForDislikeLike); });
     })
-    .catch(() => {
-      next(errorHandler);
-    });
+    .catch(next);
 }
 
 module.exports = {
